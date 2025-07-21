@@ -56,13 +56,13 @@ public class AuthService {
             // Authenticate user
             authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                    request.getEmail(),
-                    request.getPassword()
+                    request.email(),
+                    request.password()
                 )
             );
             
             // Get user details
-            User user = userRepository.findByEmail(request.getEmail())
+            User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new AuthException("User not found"));
             
             // Generate token

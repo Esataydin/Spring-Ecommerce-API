@@ -88,11 +88,11 @@ public class CartService {
         
         // Calculate totals
         BigDecimal totalAmount = itemResponses.stream()
-                .map(CartItemResponse::getTotalPrice)
+                .map(CartItemResponse::totalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
         Integer totalItems = itemResponses.stream()
-                .mapToInt(CartItemResponse::getQuantity)
+                .mapToInt(CartItemResponse::quantity)
                 .sum();
         
         return new CartResponse(itemResponses, totalAmount, totalItems);

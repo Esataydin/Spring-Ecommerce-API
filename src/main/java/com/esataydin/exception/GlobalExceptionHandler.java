@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -289,6 +290,44 @@ public class GlobalExceptionHandler {
         );
         
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    // =================================
+    // DATABASE CONSTRAINT EXCEPTIONS
+    // =================================
+    
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex, HttpServletRequest request) {
+        log.error("Database constraint violation: {}", ex.getMessage(), ex);
+        
+        String userMessage = "Operation cannot be completed due to data constraints.";
+        
+        // Check for specific constraint violations
+        String exceptionMessage = ex.getMessage().toLowerCase();
+        if (exceptionMessage.contains("foreign key constraint")) {
+            if (exceptionMessage.contains("products") && exceptionMessage.contains("order_items")) {
+                userMessage = "Cannot delete product because it is referenced in existing orders.";
+            } else if (exceptionMessage.contains("users")) {
+                userMessage = "Cannot delete user because they have associated data.";
+            } else {
+                userMessage = "Cannot delete this item because it is referenced by other data.";
+            }
+        } else if (exceptionMessage.contains("unique constraint") || exceptionMessage.contains("duplicate")) {
+            userMessage = "This data already exists. Please use different values.";
+        } else if (exceptionMessage.contains("not null constraint")) {
+            userMessage = "Required fields cannot be empty.";
+        }
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                "Data Constraint Violation",
+                userMessage,
+                request.getRequestURI()
+        );
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     // =================================

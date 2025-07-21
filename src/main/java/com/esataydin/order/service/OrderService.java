@@ -140,11 +140,11 @@ public class OrderService {
                 .collect(Collectors.toList());
         
         BigDecimal totalAmount = itemResponses.stream()
-                .map(OrderItemResponse::getTotalPrice)
+                .map(OrderItemResponse::totalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
         Integer totalItems = itemResponses.stream()
-                .mapToInt(OrderItemResponse::getQuantity)
+                .mapToInt(OrderItemResponse::quantity)
                 .sum();
         
         return new OrderResponse(
