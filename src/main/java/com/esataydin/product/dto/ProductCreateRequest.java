@@ -4,9 +4,15 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductCreateRequest {
     
     @NotBlank(message = "Product name is required")
@@ -23,47 +29,4 @@ public class ProductCreateRequest {
     @NotBlank(message = "Category is required")
     @Size(max = 100, message = "Category cannot exceed 100 characters")
     private String category;
-    
-    // Constructors
-    public ProductCreateRequest() {}
-    
-    public ProductCreateRequest(String name, BigDecimal price, Integer stock, String category) {
-        this.name = name;
-        this.price = price;
-        this.stock = stock;
-        this.category = category;
-    }
-    
-    // Getters and Setters
-    public String getName() {
-        return name;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public BigDecimal getPrice() {
-        return price;
-    }
-    
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-    
-    public Integer getStock() {
-        return stock;
-    }
-    
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
-    
-    public String getCategory() {
-        return category;
-    }
-    
-    public void setCategory(String category) {
-        this.category = category;
-    }
 }
