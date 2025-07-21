@@ -74,6 +74,7 @@ A comprehensive e-commerce REST API built with Spring Boot 3, featuring JWT auth
 - **Maven** - Dependency management
 - **Java 21** - Programming language
 - **Spring Boot DevTools** - Development utilities
+- **YAML Configuration** - Modern configuration format
 
 ## 🏗 Architecture
 
@@ -160,19 +161,18 @@ src/main/java/com/esataydin/
    docker-compose up -d
    ```
    
-   Update `src/main/resources/application.properties`:
-   ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/ecommerce_db
-   spring.datasource.username=ecommerce_user
-   spring.datasource.password=ecommerce_password
+   Update `src/main/resources/application.yml`:
+   ```yaml
+   spring:
+     datasource:
+       url: jdbc:postgresql://localhost:5432/ecommerce_db
+       username: ecommerce_user
+       password: ecommerce_password
    ```
 
    **Option 2: H2 (For development)**
-   ```properties
-   # Uncomment H2 configuration in application.properties
-   spring.datasource.url=jdbc:h2:mem:testdb
-   spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-   ```
+   
+   Activate the H2 profile by setting `spring.profiles.active=h2` or use the test profile for testing.
 
 3. **Install dependencies and run**
    ```bash
@@ -352,22 +352,44 @@ curl -X POST "http://localhost:8080/api/cart" \
 
 ## 🔧 Configuration
 
-### Application Properties
-Key configuration options in `application.properties`:
+### Application Configuration
+Key configuration options in `application.yml`:
 
-```properties
-# Database (PostgreSQL in Docker)
-spring.datasource.url=jdbc:postgresql://localhost:5432/ecommerce_db
-spring.datasource.username=ecommerce_user
-spring.datasource.password=ecommerce_password
-spring.jpa.hibernate.ddl-auto=update
+```yaml
+spring:
+  # Database (PostgreSQL in Docker)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecommerce_db
+    username: ecommerce_user
+    password: ecommerce_password
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
 
-# JWT
-jwt.secret=your-secret-key
-jwt.expiration=86400000
+# JWT Configuration
+jwt:
+  secret: your-secret-key
+  expiration: 86400000
 
-# Logging
-logging.level.com.esataydin=DEBUG
+# Server Configuration  
+server:
+  port: 8080
+```
+
+### Profile-based Configuration
+The application supports multiple profiles:
+- **Default profile**: PostgreSQL database
+- **H2 profile**: In-memory H2 database for development
+- **Test profile**: Isolated H2 database for testing
+
+Activate profiles using:
+```bash
+# For H2 development database
+java -jar app.jar --spring.profiles.active=h2
+
+# For testing
+./mvnw test -Dspring.profiles.active=test
 ```
 
 ## 🤝 Contributing
