@@ -2,9 +2,8 @@ package com.esataydin.order.controller;
 
 import com.esataydin.order.dto.OrderCreateRequest;
 import com.esataydin.order.dto.OrderResponse;
-import com.esataydin.order.exception.OrderException;
 import com.esataydin.order.service.OrderService;
-import com.esataydin.product.exception.ProductException;
+import com.esataydin.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,24 +38,19 @@ public class OrderController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Order created successfully",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid order data or insufficient stock"),
-            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "400", description = "Invalid order data or insufficient stock",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> createOrder(
+    public ResponseEntity<OrderResponse> createOrder(
             @Valid @RequestBody OrderCreateRequest request,
             Authentication authentication) {
-        try {
-            String userEmail = authentication.getName();
-            OrderResponse order = orderService.createOrder(userEmail, request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(order);
-        } catch (OrderException | ProductException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error: " + e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: An unexpected error occurred");
-        }
+        String userEmail = authentication.getName();
+        OrderResponse order = orderService.createOrder(userEmail, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
     
     @PostMapping("/from-cart")
@@ -66,22 +60,17 @@ public class OrderController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Order created successfully from cart",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Cart is empty or insufficient stock"),
-            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "400", description = "Cart is empty or insufficient stock",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> createOrderFromCart(Authentication authentication) {
-        try {
-            String userEmail = authentication.getName();
-            OrderResponse order = orderService.createOrderFromCart(userEmail);
-            return ResponseEntity.status(HttpStatus.CREATED).body(order);
-        } catch (OrderException | ProductException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error: " + e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: An unexpected error occurred");
-        }
+    public ResponseEntity<OrderResponse> createOrderFromCart(Authentication authentication) {
+        String userEmail = authentication.getName();
+        OrderResponse order = orderService.createOrderFromCart(userEmail);
+        return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
     
     @GetMapping
@@ -92,21 +81,16 @@ public class OrderController {
             @ApiResponse(responseCode = "200", description = "Order history retrieved successfully",
                     content = @Content(mediaType = "application/json", 
                     array = @ArraySchema(schema = @Schema(implementation = OrderResponse.class)))),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "400", description = "Invalid request",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> getUserOrders(Authentication authentication) {
-        try {
-            String userEmail = authentication.getName();
-            List<OrderResponse> orders = orderService.getUserOrders(userEmail);
-            return ResponseEntity.ok(orders);
-        } catch (OrderException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error: " + e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: An unexpected error occurred");
-        }
+    public ResponseEntity<List<OrderResponse>> getUserOrders(Authentication authentication) {
+        String userEmail = authentication.getName();
+        List<OrderResponse> orders = orderService.getUserOrders(userEmail);
+        return ResponseEntity.ok(orders);
     }
 }

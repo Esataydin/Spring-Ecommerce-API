@@ -3,8 +3,8 @@ package com.esataydin.auth.controller;
 import com.esataydin.auth.dto.AuthResponse;
 import com.esataydin.auth.dto.LoginRequest;
 import com.esataydin.auth.dto.RegisterRequest;
-import com.esataydin.auth.exception.AuthException;
 import com.esataydin.auth.service.AuthService;
+import com.esataydin.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,15 +31,13 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "User registered successfully",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))),
             @ApiResponse(responseCode = "400", description = "Registration failed - invalid data or email already exists",
-                    content = @Content(mediaType = "application/json"))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        try {
-            AuthResponse response = authService.register(request);
-            return ResponseEntity.ok(response);
-        } catch (AuthException e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        AuthResponse response = authService.register(request);
+        return ResponseEntity.ok(response);
     }
     
     @PostMapping("/login")
@@ -48,14 +46,12 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Login successful",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))),
             @ApiResponse(responseCode = "400", description = "Login failed - invalid credentials",
-                    content = @Content(mediaType = "application/json"))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Authentication error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        try {
-            AuthResponse response = authService.login(request);
-            return ResponseEntity.ok(response);
-        } catch (AuthException e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
     }
 }

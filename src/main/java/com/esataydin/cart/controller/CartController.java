@@ -3,9 +3,8 @@ package com.esataydin.cart.controller;
 import com.esataydin.cart.dto.CartAddRequest;
 import com.esataydin.cart.dto.CartItemResponse;
 import com.esataydin.cart.dto.CartResponse;
-import com.esataydin.cart.exception.CartException;
 import com.esataydin.cart.service.CartService;
-import com.esataydin.product.exception.ProductException;
+import com.esataydin.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,7 +14,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -37,24 +35,19 @@ public class CartController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Item added to cart successfully",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = CartItemResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request or insufficient stock"),
-            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "400", description = "Invalid request or insufficient stock",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> addToCart(
+    public ResponseEntity<CartItemResponse> addToCart(
             @Valid @RequestBody CartAddRequest request,
             Authentication authentication) {
-        try {
-            String userEmail = authentication.getName();
-            CartItemResponse cartItem = cartService.addToCart(userEmail, request);
-            return ResponseEntity.ok(cartItem);
-        } catch (CartException | ProductException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error: " + e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: An unexpected error occurred");
-        }
+        String userEmail = authentication.getName();
+        CartItemResponse cartItem = cartService.addToCart(userEmail, request);
+        return ResponseEntity.ok(cartItem);
     }
     
     @GetMapping
@@ -64,21 +57,16 @@ public class CartController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cart contents retrieved successfully",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = CartResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "400", description = "Invalid request",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> getCart(Authentication authentication) {
-        try {
-            String userEmail = authentication.getName();
-            CartResponse cart = cartService.getCart(userEmail);
-            return ResponseEntity.ok(cart);
-        } catch (CartException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error: " + e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: An unexpected error occurred");
-        }
+    public ResponseEntity<CartResponse> getCart(Authentication authentication) {
+        String userEmail = authentication.getName();
+        CartResponse cart = cartService.getCart(userEmail);
+        return ResponseEntity.ok(cart);
     }
 }
