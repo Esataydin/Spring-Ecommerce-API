@@ -2,6 +2,7 @@ package com.esataydin.order.entity;
 
 import com.esataydin.user.entity.User;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -10,14 +11,21 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Order {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Only include ID in equals/hashCode
     private Long id;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude // Exclude to prevent lazy loading in toString
     private User user;
     
     @CreationTimestamp
@@ -25,46 +33,13 @@ public class Order {
     private LocalDateTime createdAt;
     
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
     
-    // Constructors
-    public Order() {}
-    
+    // Custom constructor for business logic
     public Order(User user) {
         this.user = user;
-    }
-    
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public User getUser() {
-        return user;
-    }
-    
-    public void setUser(User user) {
-        this.user = user;
-    }
-    
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-    
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-    
-    public List<OrderItem> getOrderItems() {
-        return orderItems;
-    }
-    
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
+        this.orderItems = new ArrayList<>();
     }
     
     // Helper method to add order item

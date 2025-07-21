@@ -2,13 +2,20 @@ package com.esataydin.order.entity;
 
 import com.esataydin.product.entity.Product;
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "order_items")
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class OrderItem {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Only include ID in equals/hashCode
     private Long id;
     
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,45 +29,10 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
     
-    // Constructors
-    public OrderItem() {}
-    
+    // Custom constructor for business logic
     public OrderItem(Order order, Product product, Integer quantity) {
         this.order = order;
         this.product = product;
-        this.quantity = quantity;
-    }
-    
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public Order getOrder() {
-        return order;
-    }
-    
-    public void setOrder(Order order) {
-        this.order = order;
-    }
-    
-    public Product getProduct() {
-        return product;
-    }
-    
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-    
-    public Integer getQuantity() {
-        return quantity;
-    }
-    
-    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 }

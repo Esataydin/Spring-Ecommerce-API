@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,10 +15,16 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User implements UserDetails {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Only include ID in equals/hashCode
     private Long id;
     
     @NotBlank(message = "Name is required")
@@ -37,6 +44,7 @@ public class User implements UserDetails {
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private Role role = Role.USER;
     
     @Column(name = "created_at")
@@ -46,28 +54,35 @@ public class User implements UserDetails {
     private LocalDateTime updatedAt;
     
     @Column(name = "is_enabled")
+    @Builder.Default
     private boolean enabled = true;
     
     @Column(name = "is_account_non_expired")
+    @Builder.Default
     private boolean accountNonExpired = true;
     
     @Column(name = "is_account_non_locked")
+    @Builder.Default
     private boolean accountNonLocked = true;
     
     @Column(name = "is_credentials_non_expired")
+    @Builder.Default
     private boolean credentialsNonExpired = true;
     
     public enum Role {
         ADMIN, USER
     }
     
-    // Constructors
-    public User() {}
-    
+    // Custom constructors for business logic
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.role = Role.USER;
+        this.enabled = true;
+        this.accountNonExpired = true;
+        this.accountNonLocked = true;
+        this.credentialsNonExpired = true;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -77,6 +92,10 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.role = role;
+        this.enabled = true;
+        this.accountNonExpired = true;
+        this.accountNonLocked = true;
+        this.credentialsNonExpired = true;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -88,102 +107,8 @@ public class User implements UserDetails {
     }
     
     @Override
-    public String getPassword() {
-        return password;
-    }
-    
-    @Override
     public String getUsername() {
         return email; // Using email as username for authentication
-    }
-    
-    @Override
-    public boolean isAccountNonExpired() {
-        return accountNonExpired;
-    }
-    
-    @Override
-    public boolean isAccountNonLocked() {
-        return accountNonLocked;
-    }
-    
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return credentialsNonExpired;
-    }
-    
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
-    
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getName() {
-        return name;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public String getEmail() {
-        return email;
-    }
-    
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    
-    public Role getRole() {
-        return role;
-    }
-    
-    public void setRole(Role role) {
-        this.role = role;
-    }
-    
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-    
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-    
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-    
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-    
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-    
-    public void setAccountNonExpired(boolean accountNonExpired) {
-        this.accountNonExpired = accountNonExpired;
-    }
-    
-    public void setAccountNonLocked(boolean accountNonLocked) {
-        this.accountNonLocked = accountNonLocked;
-    }
-    
-    public void setCredentialsNonExpired(boolean credentialsNonExpired) {
-        this.credentialsNonExpired = credentialsNonExpired;
     }
     
     @PrePersist

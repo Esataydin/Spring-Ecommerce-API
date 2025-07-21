@@ -5,15 +5,23 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "products")
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Product {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Only include ID in equals/hashCode
     private Long id;
     
     @NotBlank(message = "Product name is required")
@@ -28,6 +36,7 @@ public class Product {
     
     @NotNull(message = "Stock is required")
     @Column(nullable = false)
+    @Builder.Default
     private Integer stock = 0;
     
     @NotBlank(message = "Category is required")
@@ -35,54 +44,11 @@ public class Product {
     @Column(nullable = false, length = 100)
     private String category;
     
-    // Constructors
-    public Product() {}
-    
+    // Custom constructor for business logic
     public Product(String name, BigDecimal price, Integer stock, String category) {
         this.name = name;
         this.price = price;
-        this.stock = stock;
-        this.category = category;
-    }
-    
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getName() {
-        return name;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public BigDecimal getPrice() {
-        return price;
-    }
-    
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-    
-    public Integer getStock() {
-        return stock;
-    }
-    
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
-    
-    public String getCategory() {
-        return category;
-    }
-    
-    public void setCategory(String category) {
+        this.stock = stock != null ? stock : 0;
         this.category = category;
     }
     

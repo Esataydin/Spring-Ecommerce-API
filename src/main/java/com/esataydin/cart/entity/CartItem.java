@@ -3,13 +3,20 @@ package com.esataydin.cart.entity;
 import com.esataydin.product.entity.Product;
 import com.esataydin.user.entity.User;
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "cart_items")
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class CartItem {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Only include ID in equals/hashCode
     private Long id;
     
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,45 +30,10 @@ public class CartItem {
     @Column(nullable = false)
     private Integer quantity;
     
-    // Constructors
-    public CartItem() {}
-    
+    // Custom constructor for business logic
     public CartItem(User user, Product product, Integer quantity) {
         this.user = user;
         this.product = product;
-        this.quantity = quantity;
-    }
-    
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public User getUser() {
-        return user;
-    }
-    
-    public void setUser(User user) {
-        this.user = user;
-    }
-    
-    public Product getProduct() {
-        return product;
-    }
-    
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-    
-    public Integer getQuantity() {
-        return quantity;
-    }
-    
-    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 }
