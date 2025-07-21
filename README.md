@@ -53,6 +53,13 @@ A comprehensive e-commerce REST API built with Spring Boot 3, featuring JWT auth
 - **Comprehensive endpoint documentation**
 - **Request/response examples**
 
+### 🚨 Error Handling
+- **Global Exception Handler** with centralized error management
+- **Consistent error responses** across all API endpoints
+- **Module-specific exception handling** for each business domain
+- **Comprehensive error logging** and monitoring
+- **Professional error schemas** with timestamp, status, and detailed messages
+
 ## 🛠 Technology Stack
 
 ### Backend
@@ -83,37 +90,40 @@ src/main/java/com/esataydin/
 ├── auth/                     # Authentication module
 │   ├── controller/          # Auth endpoints
 │   ├── dto/                 # Data transfer objects
-│   ├── exception/           # Custom exceptions
+│   ├── exception/           # Auth-specific exceptions
 │   ├── security/            # Security configuration & JWT
 │   └── service/             # Authentication business logic
 ├── cart/                    # Shopping cart module
 │   ├── controller/          # Cart endpoints
 │   ├── dto/                 # Cart DTOs
 │   ├── entity/              # Cart entities
-│   ├── exception/           # Cart exceptions
+│   ├── exception/           # Cart-specific exceptions
 │   ├── repository/          # Cart data access
 │   └── service/             # Cart business logic
 ├── order/                   # Order management module
 │   ├── controller/          # Order endpoints
 │   ├── dto/                 # Order DTOs
 │   ├── entity/              # Order entities
-│   ├── exception/           # Order exceptions
+│   ├── exception/           # Order-specific exceptions
 │   ├── repository/          # Order data access
 │   └── service/             # Order business logic
 ├── product/                 # Product management module
 │   ├── controller/          # Product endpoints
 │   ├── dto/                 # Product DTOs
 │   ├── entity/              # Product entities
-│   ├── exception/           # Product exceptions
+│   ├── exception/           # Product-specific exceptions
 │   ├── repository/          # Product data access
 │   └── service/             # Product business logic
 ├── user/                    # User management module
 │   ├── entity/              # User entities
 │   ├── repository/          # User data access
 │   └── service/             # User business logic
+├── exception/               # Global exception handling
+│   ├── ErrorResponse.java   # Standardized error response DTO
+│   └── GlobalExceptionHandler.java # Centralized exception handler
 ├── config/                  # Application configuration
 │   └── SwaggerConfig.java   # Swagger/OpenAPI config
-└── SpringEcommerceApiApplication.java
+└── SpringEcommerceApiApplication.java # Main application class
 ```
 
 ## 🚀 Getting Started
