@@ -69,4 +69,44 @@ public class CartController {
         CartResponse cart = cartService.getCart(userEmail);
         return ResponseEntity.ok(cart);
     }
+    
+    @DeleteMapping("/product/{productId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @Operation(summary = "Remove product from cart", description = "Remove a specific product from the user's shopping cart",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product removed from cart successfully"),
+            @ApiResponse(responseCode = "400", description = "Product not found in cart",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<String> removeFromCart(
+            @PathVariable Long productId,
+            Authentication authentication) {
+        String userEmail = authentication.getName();
+        cartService.removeFromCart(userEmail, productId);
+        return ResponseEntity.ok("Product removed from cart successfully");
+    }
+    
+    @DeleteMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @Operation(summary = "Clear cart", description = "Remove all items from the user's shopping cart",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cart cleared successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Access denied - Authentication required",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<String> clearCart(Authentication authentication) {
+        String userEmail = authentication.getName();
+        cartService.clearCart(userEmail);
+        return ResponseEntity.ok("Cart cleared successfully");
+    }
 }

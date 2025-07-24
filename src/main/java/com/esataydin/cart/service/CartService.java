@@ -98,6 +98,28 @@ public class CartService {
         return new CartResponse(itemResponses, totalAmount, totalItems);
     }
     
+    public void removeFromCart(String userEmail, Long productId) {
+        // Find user
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new CartException("User not found"));
+        
+        // Check if cart item exists
+        CartItem cartItem = cartItemRepository.findByUserIdAndProductId(user.getId(), productId)
+                .orElseThrow(() -> new CartException("Product not found in cart"));
+        
+        // Delete the cart item
+        cartItemRepository.delete(cartItem);
+    }
+    
+    public void clearCart(String userEmail) {
+        // Find user
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new CartException("User not found"));
+        
+        // Delete all cart items for the user
+        cartItemRepository.deleteByUserId(user.getId());
+    }
+    
     private CartItemResponse convertToCartItemResponse(CartItem cartItem) {
         Product product = cartItem.getProduct();
         BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
